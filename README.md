@@ -1,0 +1,2 @@
+# Physics-Informed-Neural-Networks-PINNs-for-Climate-Driven-Evolutionary-Dynamics-in-Epidemics
+A TensorFlow Physics-Informed Neural Network (PINN) modeling climate driven evolutionary dynamics of Dengue fever. By embedding SEIR ODEs into the loss function, the model discovers the hidden, time-dependent transmission rate from weather data, revealing how the pathogen mathematically adapts to climate anomalies.
