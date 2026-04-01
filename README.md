@@ -20,11 +20,10 @@
    - [Phase 1: Synthetic Pre-Training](#phase-1-synthetic-pre-training)
    - [Phase 2: Real-Data Fine-Tuning](#phase-2-real-data-fine-tuning)
 10. [Evaluation Metrics](#10-evaluation-metrics)
-11. [Key Bug Fixes & Lessons Learned](#11-key-bug-fixes--lessons-learned)
-12. [Results](#12-results)
-13. [How to Run](#13-how-to-run)
-14. [Configuration Reference](#14-configuration-reference)
-15. [Dependencies](#15-dependencies)
+11. [Results](#11-results)
+12. [How to Run](#12-how-to-run)
+13. [Configuration Reference](#13-configuration-reference)
+14. [Dependencies](#14-dependencies)
 
 ---
 
@@ -427,89 +426,7 @@ Automatically classifies the fit:
 
 ---
 
-## 11. Key Bug Fixes & Lessons Learned
-
-This section documents all fixes applied across versions v1 → v6, progressing from **Test R² = −0.18 (SEVERE)** to **Test R² = +0.50 (HIGH)**.
-
-### 🔴 Bug 1 — Missing Autocorrelation Feature (PRIMARY)
-
-**Problem:** The original model only used temperature and rainfall as inputs. Data analysis on real Colombo data showed:
-
-```
-Dengue Cases (lag 1) correlation: 0.751  ← dominant
-Dengue Cases (lag 2) correlation: 0.400
-Rainfall     (lag 2) correlation: 0.244  ← strongest weather signal
-Temperature  (lag 0) correlation: -0.037
-```
-
-A model without past case counts was attempting an essentially **impossible task** — weather alone simply cannot explain dengue variance in this dataset (even Ridge regression gets R²=−0.24 with weather only).
-
-**Fix:** Added `Cases_t-1, Cases_t-2, Cases_t-3` as explicit input features.
-
----
-
-### 🔴 Bug 2 — Synthetic-Real Domain Mismatch
-
-**Problem:** Training jointly on 300 synthetic + 105 real rows caused the model to learn SIRS-specific patterns (periodic troughs near zero, different amplitude cycles) that do not appear in the real Colombo data.
-
-**Fix:** 2-phase training — pre-train on synthetic, fine-tune on real.
-
----
-
-### 🟡 Bug 3 — Physics Weight Too High
-
-**Problem:** `PHYSICS_WEIGHT = 0.5` meant the SIR ODE residual dominated gradients. The model achieved only Train R² = 0.024 — it couldn't even fit training data.
-
-**Fix:** `PHYSICS_WEIGHT = 0.05` (Phase 1) and `0.10` (Phase 2 — increased from 0.01 in v5 to act as a domain regulariser).
-
----
-
-### 🟡 Bug 4 — Time-Step Collision in Combined Mode
-
-**Problem:** Synthetic rows had Time_Step 0–299 and real rows had Time_Step 0–131. Concatenating them created **105 duplicate time values** and a non-monotone temporal sequence. The time signal was meaningless.
-
-**Fix:** Reassign sequential time steps across the full combined dataset:
-```
-Synthetic      : t = 0, 1, ..., 299
-Real train     : t = 300, 301, ..., 404
-Real test      : t = 405, 406, ..., 431
-```
-
----
-
-### 🟡 Bug 5 — Inconsistent Time Normalisation
-
-**Problem:** Each split normalised its own `t` by its own max:
-- Train: `t / 299`  →  range `[0.0, 1.0]`
-- Test:  `t / 131`  →  range `[0.80, 1.0]`
-
-Completely different scales → distributional shift.
-
-**Fix:** Compute `global_t_max` from the training set once; apply to both train and test.
-
----
-
-### 🟡 Bug 6 — Excess Model Capacity & Insufficient Regularisation (v6)
-
-**Problem:** After fixing bugs 1–5, the model reached Test R²=0.57 but with a Train/Test gap of 0.20 — indicating overfitting. Analysis showed:
-- **9,347 parameters for 102 training samples** → param:sample ratio ≈ 92 (too high)
-- **Dropout 0.10** and **weight decay 1e-4** were too weak for this data size
-- A bootstrap experiment confirmed the gap was **partly statistical noise** (R² std ≈ ±0.30 on n=25 test samples) and partly real overfitting
-
-**Fixes applied (v6):**
-
-| Lever | Before (v5) | After (v6) | Rationale |
-|---|---|---|---|
-| Hidden size | 64 | **32** | Cuts capacity 4×; param:sample ratio 92 → 26 |
-| Dropout | 0.10 | **0.25** | Forces neurons to share load; key for small data |
-| L2 weight decay (Phase 2) | 1e-4 | **5e-4** | Stronger penalty on large weights |
-| Physics weight (Phase 2) | 0.01 | **0.10** | ODE constraint regularises S/I trajectories |
-| Input noise σ | — | **0.02** | Gaussian augmentation on all input features per batch |
-| TimeSeriesCV | — | **5-fold** | Stable OOF R² estimate; confirms single-split gap is partly noise |
-
----
-
-## 12. Results
+## 11. Results
 
 ### Full Version History (real test data)
 
@@ -554,7 +471,7 @@ The train/test R² gap is the **irreducible minimum** given 132 monthly data poi
 
 ---
 
-## 13. How to Run
+## 12. How to Run
 
 ### Step 1: Activate the virtual environment
 
@@ -605,7 +522,7 @@ The script will:
 
 ---
 
-## 14. Configuration Reference
+## 13. Configuration Reference
 
 All hyperparameters are defined at the top of `src/train.py`:
 
@@ -646,7 +563,7 @@ P2_LR_FACTOR     = 0.5          # LR reduction factor
 
 ---
 
-## 15. Dependencies
+## 14. Dependencies
 
 Managed via the `pinn_env` virtual environment.
 
