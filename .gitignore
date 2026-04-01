@@ -1,0 +1,111 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+pip-wheel-metadata/
+
+# ─── Virtual Environment ──────────────────────────────────────────────────────
+pinn_env/
+venv/
+env/
+.venv/
+ENV/
+
+# ─── Jupyter Notebooks ────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── PyTorch Checkpoints & Saved Models ──────────────────────────────────────
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+saved_models/
+
+# ─── Data Files ───────────────────────────────────────────────────────────────
+# Large raw files — do not commit to git (use DVC or a data registry instead)
+Data/SriLanka_Weather_Dataset.csv
+Data/Dengue_Data*.xlsx
+Data/Dengue_Data*.xls
+
+# Synthetic and cleaned datasets are small enough to track, but you may
+# choose to exclude them too — uncomment the lines below if so:
+# Data/Synthetic_Dataset.csv
+# Data/Cleaned_Dataset.csv
+
+# ─── Outputs & Plots ──────────────────────────────────────────────────────────
+outputs/
+plots/
+figures/
+results/
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.svg
+
+# ─── macOS ────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# ─── IDEs & Editors ───────────────────────────────────────────────────────────
+# VS Code
+.vscode/
+
+# PyCharm / JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# ─── Environment Variables ────────────────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+runs/          # TensorBoard run directories
+
+# ─── Coverage & Testing ───────────────────────────────────────────────────────
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig
